@@ -102,7 +102,7 @@ def get_log_function(F):
                 logger.log_at_index(data, i)
 
         # Log model metrics
-        keys, subkeys = vmap(jx.random.split)(keys)
+        run_states.key, subkeys = jnp.transpose(vmap(jx.random.split)(run_states.key),axes=(1,0,2))
         stacked_metrics = model_eval(S.buffer_state,S.model_opt_state,subkeys)
         stacked_metrics["time"] = curr_time
         unstacked_metrics = tree_unstack(stacked_metrics)
@@ -202,7 +202,7 @@ try:
         ellapsed_time = time.time()-last_time
         last_time = time.time()
 
-        run_states.key, subkeys = vmap(jx.random.split)(run_states.key)
+        run_states.key, subkeys = jnp.transpose(vmap(jx.random.split)(run_states.key),axes=(1,0,2))
         log_dicts = log(run_states, metrics, log_dicts, logger, ellapsed_time, subkeys)
 
         # periodically save checkpoint to disk
