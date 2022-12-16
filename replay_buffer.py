@@ -87,7 +87,7 @@ class replay_buffer:
 
             # find last terminal in sequence besides the one found in the last step (if any others are present)
             last_terminal_index = jnp.nonzero(jnp.flip(terms[:-1]),size=1, fill_value=-1)[0]
-            # invert flip, maintining -1 as special case
+            # invert flip, maintaining -1 as special case
             last_terminal_index = jnp.where(jnp.equal(last_terminal_index,-1),-1, sequence_length-2-last_terminal_index)
 
             buffer_end_in_sample = jnp.sum(jnp.equal(jnp.mod(jnp.arange(sequence_length-1)+i, self.buffer_size),(location-1)%self.buffer_size))

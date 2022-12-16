@@ -10,7 +10,7 @@ from types import SimpleNamespace
 
 #This returns the model loss along with intermediate latent states which are then reused to initialize the actor-critic training
 def get_model_loss_and_latents_function(funcs, image_state, num_actions, config):
-    if(config.latent_type=='gaussian' or config.latent_type=='tanh_gaussian'):
+    if(config.latent_type=='gaussian'):
         latent_KL = prob.gaussian_KL
         # Posterior entropy regularizes toward univariate Gaussian distribution
         base_dist ={'mu':jnp.zeros(config.num_features), 'sigma':jnp.ones(config.num_features)}
@@ -183,7 +183,7 @@ def get_AC_loss_function(pi_func, V_func, model_funcs, num_actions, config):
 ########################################################################
 
 def get_model_eval_function(model_funcs, buffer, get_model_params, image_state, num_actions, config):
-    if(config.latent_type=='gaussian' or config.latent_type=='tanh_gaussian'):
+    if(config.latent_type=='gaussian'):
         latent_entropy = prob.gaussian_entropy
         latent_cross_entropy = prob.gaussian_cross_entropy
         # base_dist ={'mu':jnp.zeros(config.num_features), 'sigma':jnp.ones(config.num_features)}
