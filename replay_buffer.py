@@ -29,7 +29,7 @@ class replay_buffer:
 
         buffers = jx.tree_map(lambda x,y: x.at[location].set(y),buffers,list(args))
 
-        full = jnp.where(location >= self.buffer_size, True, full)
+        full = jnp.where(location+1 >= self.buffer_size, True, full)
         # Increment the buffer location
         location = (location + 1) % self.buffer_size
         state = (location, full, buffers)
@@ -80,20 +80,21 @@ class replay_buffer:
             terms = terminal_buffer[jnp.mod(jnp.arange(sequence_length)+i, self.buffer_size)]
             first_terminal_index = jnp.nonzero(terms,size=1, fill_value=-1)[0]
 
-            max_index = jnp.where(full, self.buffer_size, location)
-
             # shift such that first terminal index is the last item in sequence
-            i = jnp.where(first_terminal_index!=-1,(i-(sequence_length-1-first_terminal_index))%max_index, i)
+            i = jnp.where(first_terminal_index!=-1,(i-(sequence_length-1-first_terminal_index))%self.buffer_size, i)
 
-            terms = terminal_buffer[jnp.mod(jnp.arange(sequence_length)+i, max_index)]
+            terms = terminal_buffer[jnp.mod(jnp.arange(sequence_length)+i, self.buffer_size)]
+
             # find last terminal in sequence besides the one found in the last step (if any others are present)
             last_terminal_index = jnp.nonzero(jnp.flip(terms[:-1]),size=1, fill_value=-1)[0]
+            # invert flip, maintining -1 as special case
+            last_terminal_index = jnp.where(jnp.equal(last_terminal_index,-1),-1, sequence_length-2-last_terminal_index)
 
-            buffer_end_in_sample = jnp.sum(jnp.equal(jnp.mod(jnp.arange(sequence_length)+i, max_index),location))
-            last_terminal_index = jnp.where(buffer_end_in_sample, jnp.maximum(last_terminal_index,location-i), last_terminal_index)
+            buffer_end_in_sample = jnp.sum(jnp.equal(jnp.mod(jnp.arange(sequence_length-1)+i, self.buffer_size),(location-1)%self.buffer_size))
+            last_terminal_index = jnp.where(buffer_end_in_sample, jnp.maximum(last_terminal_index,(location-i)%self.buffer_size), last_terminal_index)
 
-            # shift i to just after the second last terminal sequence (only if we found a terminal in the first step and another, or buffer end in the second)
-            i = jnp.where(jnp.logical_and(first_terminal_index!=-1,last_terminal_index!=-1),(i+sequence_length-last_terminal_index-1)%max_index,i)
+            # shift i to just after the second last terminal index or buffer end (only if we found a terminal in the first step and another, or buffer end in the second)
+            i = jnp.where(jnp.logical_and(first_terminal_index!=-1,last_terminal_index!=-1),(i+last_terminal_index+1)%self.buffer_size,i)
             return i
 
         start_indices = vmap(adjust_index, in_axes=(0,None))(start_indices,state)
