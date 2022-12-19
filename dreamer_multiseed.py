@@ -194,6 +194,7 @@ last_time = time.time()
 # Main training loop
 ########################################################################
 
+i = start_i
 tqdm.write("Beginning run...")
 try:
     for i in tqdm(range(start_i,config.num_steps//config.eval_frequency), initial=start_i, total=config.num_steps//config.eval_frequency):
@@ -216,5 +217,5 @@ except Exception as e:
 
 # Save Data and final checkpoint
 save_log(log_dicts, config)
-save_checkpoint(run_states, log_dicts, i, opt_state_names)
+save_checkpoint(run_states, log_dicts, i, wandb_ids, opt_state_names)
 logger.end()

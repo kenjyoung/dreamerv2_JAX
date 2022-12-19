@@ -174,6 +174,7 @@ last_time = time.time()
 # Main training loop
 ########################################################################
 
+i = start_i
 tqdm.write("Beginning run...")
 for i in tqdm(range(start_i,config.num_steps//config.eval_frequency), initial=start_i, total=config.num_steps//config.eval_frequency):
     run_state, metrics = agent_environment_interaction_loop_function(run_state)
