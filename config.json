@@ -4,7 +4,7 @@
  "model_alpha": 0.0002,
  "pi_alpha":0.00004,
  "V_alpha":0.0001,
- "target_update_frequency":100,
+ "target_update_frequency":10,
  "eps_adam":1e-5,
  "wd_adam":1e-6,
  "beta": 0.001,

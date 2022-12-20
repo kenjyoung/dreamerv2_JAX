@@ -114,7 +114,7 @@ def get_agent_environment_interaction_loop_function(F, iterations, config):
                 S.V_opt_state = F.V_update(S.opt_t, V_grads, S.V_opt_state)
 
                 # Sync V_target params periodically
-                S.V_target_params = jx.tree_map(lambda x,y: jnp.where(S.env_t%config.target_update_frequency==0,x,y),F.get_V_params(S.V_opt_state), S.V_target_params)
+                S.V_target_params = jx.tree_map(lambda x,y: jnp.where(S.opt_t%config.target_update_frequency==0,x,y),F.get_V_params(S.V_opt_state), S.V_target_params)
 
                 S.opt_t+=1
                 return S
