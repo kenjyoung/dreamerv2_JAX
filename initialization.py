@@ -169,7 +169,8 @@ def get_init_fns(env, config):
         h = jnp.zeros(dummy_h.shape)
         phi = jnp.zeros(dummy_phi.shape)
 
-        env_state, _ = env.reset(dummy_key)
+        key, subkey = jx.random.split(key)
+        env_state, _ = env.reset(subkey)
 
         episode_return = jnp.array(0.0)
         last_reward = jnp.array(0.0)
