@@ -4,6 +4,8 @@ from jax import jit
 from jax.example_libraries import optimizers
 from jax.tree_util import register_pytree_node
 
+import numpy as np
+
 import json
 import pickle as pkl
 import argparse
@@ -81,7 +83,7 @@ def get_log_function(F):
         returns = M["return"][M["episode_complete"]]
         return_times = curr_time-config.eval_frequency+jnp.arange(config.eval_frequency)[M["episode_complete"]]
         for ret, t in zip(returns, return_times):
-            wandb.log({"return":ret,"return_time":t})
+            wandb.log({"return":np.array(ret),"return_time":np.array(t)})
         log_dicts["returns_and_times"] = update_log_dict(log_dicts["returns_and_times"],{"return":returns,"return_time":return_times})
 
         # Log model metrics
@@ -89,7 +91,7 @@ def get_log_function(F):
         metrics = model_eval(S.buffer_state,S.model_opt_state,subkey)
         metrics["time"] = curr_time
         metrics["time_per_step"] = wallclock/config.eval_frequency
-        wandb.log(metrics)
+        wandb.log({key:np.array(value) for key, value in metrics.items()})
         log_dicts["metrics"] = update_log_dict(log_dicts["metrics"],metrics)
         return log_dicts
     return log
