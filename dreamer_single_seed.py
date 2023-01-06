@@ -87,7 +87,7 @@ def get_log_function(F):
         log_dicts["returns_and_times"] = update_log_dict(log_dicts["returns_and_times"],{"return":returns,"return_time":return_times})
 
         # Log model metrics
-        key, subkey = jx.random.split(S.key)
+        key, subkey = jx.random.split(key)
         metrics = model_eval(S.buffer_state,S.model_opt_state,subkey)
         metrics["time"] = curr_time
         metrics["time_per_step"] = wallclock/config.eval_frequency

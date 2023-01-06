@@ -88,7 +88,7 @@ def get_log_function(F):
     model_eval = vmap(jit(F.model_eval))
 
     def log(S, M, log_dicts_list, logger, wallclock, keys):
-        curr_time = run_states.env_t
+        curr_time = S.env_t
 
         # Log complete episode returns for each run seperately
         unstacked_M = tree_unstack(M)
@@ -102,7 +102,7 @@ def get_log_function(F):
                 logger.log_at_index(data, i)
 
         # Log model metrics
-        run_states.key, subkeys = jnp.transpose(vmap(jx.random.split)(run_states.key),axes=(1,0,2))
+        keys, subkeys = jnp.transpose(vmap(jx.random.split)(keys),axes=(1,0,2))
         stacked_metrics = model_eval(S.buffer_state,S.model_opt_state,subkeys)
         stacked_metrics["time"] = curr_time
         unstacked_metrics = tree_unstack(stacked_metrics)
