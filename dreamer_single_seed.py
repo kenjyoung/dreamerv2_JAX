@@ -70,7 +70,7 @@ def update_log_dict(d, u):
 def save_log(log_dicts, config):
     with open(args.output, 'wb') as f:
         data = log_dicts
-        data["config"]=dict(config)
+        data["config"]=config.__dict__
         pkl.dump(data, f)
 
 def get_log_function(F):
