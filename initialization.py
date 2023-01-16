@@ -190,7 +190,7 @@ def get_init_fns(env, config):
         # jit compile all returned functions
         function_dict = {name:jx.tree_map(lambda x: jit(x),var_dict[name]) for name in function_names}
         # Add classes as well (methods are already jit compiled)
-        fuction_dict = function_dict.update({name:var_dict[name] for name in class_names})
+        function_dict.update({name:var_dict[name] for name in class_names})
 
         # Contains functions and classes
         functions = SimpleNamespace(**function_dict)
